@@ -7,7 +7,7 @@ export function toViewableImageUrl(url: string): string {
 
   const fileId = extractDriveFileId(url);
   if (fileId) {
-    return `https://drive.usercontent.google.com/download?id=${fileId}&export=view`;
+    return `https://lh3.googleusercontent.com/d/${fileId}`;
   }
 
   return url;

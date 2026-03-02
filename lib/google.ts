@@ -16,7 +16,10 @@ function getAuth() {
   const auth = new google.auth.JWT({
     email: clientEmail,
     key: privateKey,
-    scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
+    scopes: [
+      "https://www.googleapis.com/auth/spreadsheets.readonly",
+      "https://www.googleapis.com/auth/drive.readonly",
+    ],
   });
 
   return { auth, sheetId };
