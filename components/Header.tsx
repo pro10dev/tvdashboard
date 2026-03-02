@@ -37,7 +37,7 @@ export default function Header({ lastUpdated, connectionLost, isStale }: HeaderP
   }, []);
 
   const updatedLabel = lastUpdated
-    ? `Updated ${new Date(lastUpdated).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}`
+    ? `Data Fetched and Updated at: ${new Date(lastUpdated).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}`
     : "";
 
   return (
@@ -58,6 +58,9 @@ export default function Header({ lastUpdated, connectionLost, isStale }: HeaderP
             <div className="flex items-center gap-3 mt-1">
               <span className="text-2xl tracking-wide">{date}</span>
             </div>
+            {updatedLabel && (
+              <span className="text-muted">{updatedLabel}</span>
+            )}
           </div>
         </div>
 
@@ -80,9 +83,6 @@ export default function Header({ lastUpdated, connectionLost, isStale }: HeaderP
                 <div className="live-dot" />
                 <span className="text-sm font-semibold text-success tracking-wide">LIVE</span>
               </div>
-            )}
-            {updatedLabel && (
-              <span className="text-sm text-muted">{updatedLabel}</span>
             )}
           </div>
 
