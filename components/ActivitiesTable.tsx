@@ -1,12 +1,16 @@
 import type { Activity } from "@/lib/types";
 import { getRealtimeActivityStatus } from "@/lib/status";
+import { formatDate } from "@/lib/format";
 
 interface ActivitiesTableProps {
   activities: Activity[];
 }
 
 export default function ActivitiesTable({ activities }: ActivitiesTableProps) {
-  const display = activities.slice(0, 8);
+  const display = activities.filter((a) => {
+    const status = getRealtimeActivityStatus(a);
+    return status === "Upcoming";
+  });
 
   return (
     <div className="px-10 py-2 animate-fade-in" style={{ animationDelay: "200ms" }}>
@@ -14,7 +18,7 @@ export default function ActivitiesTable({ activities }: ActivitiesTableProps) {
         <thead>
           <tr className="border-b border-border/60 text-left">
             <th
-              className="w-[36%] py-3 pr-4 text-base font-bold tracking-[0.1em] text-muted/70 uppercase"
+              className="w-[28%] py-3 pr-4 text-base font-bold tracking-[0.1em] text-muted/70 uppercase"
               style={{ fontFamily: "var(--font-oswald), var(--font-display)" }}
             >
               Activity
@@ -26,19 +30,25 @@ export default function ActivitiesTable({ activities }: ActivitiesTableProps) {
               Date
             </th>
             <th
-              className="w-[12%] py-3 pr-4 text-base font-bold tracking-[0.1em] text-muted/70 uppercase"
+              className="w-[10%] py-3 pr-4 text-base font-bold tracking-[0.1em] text-muted/70 uppercase"
               style={{ fontFamily: "var(--font-oswald), var(--font-display)" }}
             >
               Time
             </th>
             <th
-              className="w-[13%] py-3 pr-4 text-base font-bold tracking-[0.1em] text-muted/70 uppercase"
+              className="w-[16%] py-3 pr-4 text-base font-bold tracking-[0.1em] text-muted/70 uppercase"
+              style={{ fontFamily: "var(--font-oswald), var(--font-display)" }}
+            >
+              Location
+            </th>
+            <th
+              className="w-[12%] py-3 pr-4 text-base font-bold tracking-[0.1em] text-muted/70 uppercase"
               style={{ fontFamily: "var(--font-oswald), var(--font-display)" }}
             >
               Attendees
             </th>
             <th
-              className="w-[25%] py-3 text-base font-bold tracking-[0.1em] text-muted/70 uppercase"
+              className="w-[20%] py-3 text-base font-bold tracking-[0.1em] text-muted/70 uppercase"
               style={{ fontFamily: "var(--font-oswald), var(--font-display)" }}
             >
               Status
@@ -54,7 +64,7 @@ export default function ActivitiesTable({ activities }: ActivitiesTableProps) {
                 className={`border-b border-border/30 ${rowStyle(activity, status)} animate-fade-in-up`}
                 style={{ animationDelay: `${300 + i * 60}ms` }}
               >
-                <td className="py-3.5 pr-4 text-xl font-semibold truncate">
+                <td className="py-3.5 pr-4 text-xl font-semibold">
                   <span className="flex items-center gap-3">
                     {activity.activity_name}
                     {activity.is_today && (
@@ -65,9 +75,10 @@ export default function ActivitiesTable({ activities }: ActivitiesTableProps) {
                     )}
                   </span>
                 </td>
-                <td className="py-3.5 pr-4 text-xl tabular-nums truncate">{activity.activity_date}</td>
-                <td className="py-3.5 pr-4 text-xl tabular-nums truncate">{activity.activity_time}</td>
-                <td className="py-3.5 pr-4 text-xl tabular-nums truncate">{activity.attendees}</td>
+                <td className="py-3.5 pr-4 text-xl tabular-nums">{formatDate(activity.activity_date)}</td>
+                <td className="py-3.5 pr-4 text-xl tabular-nums">{activity.activity_time}</td>
+                <td className="py-3.5 pr-4 text-xl">{activity.location}</td>
+                <td className="py-3.5 pr-4 text-xl tabular-nums">{activity.attendees}</td>
                 <td className="py-3.5">
                   <StatusBadge status={status} />
                 </td>

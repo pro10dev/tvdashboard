@@ -46,9 +46,13 @@ export default async function Home() {
     };
   }
 
+  const tabRotateMinutes = parseFloat(process.env.TAB_ROTATE_MINUTES || "0.5");
+  const refreshMinutes = parseFloat(process.env.REFRESH_MINUTES || "5");
+  const dutyShiftTime = process.env.DUTY_SHIFT_TIME || "08:00";
+
   return (
     <ErrorBoundary>
-      <Dashboard initialData={data} />
+      <Dashboard initialData={data} tabRotateMinutes={tabRotateMinutes} refreshMinutes={refreshMinutes} dutyShiftTime={dutyShiftTime} />
     </ErrorBoundary>
   );
 }

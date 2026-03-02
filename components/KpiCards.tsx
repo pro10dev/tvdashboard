@@ -73,23 +73,23 @@ export default function KpiCards({ kpis, tab = "activities" }: KpiCardsProps) {
   const cards = tab === "compliances" ? COMPLIANCE_CARDS : ACTIVITY_CARDS;
 
   return (
-    <div className="grid grid-cols-4 gap-5 px-10 py-5">
+    <div className="flex gap-4 px-10 py-3">
       {cards.map((card, i) => (
         <div
           key={card.key}
           className={`
-            tv-card flex flex-col items-center justify-center rounded-xl ${card.borderColor} p-7
+            tv-card flex items-center gap-3 rounded-lg ${card.borderColor} px-6 py-3
             ${card.glowClass} animate-fade-in-up
           `}
           style={{ animationDelay: `${i * 80}ms` }}
         >
           <span
-            className={`text-6xl font-bold ${card.color} tabular-nums`}
+            className={`text-4xl font-bold ${card.color} tabular-nums leading-none`}
             style={{ fontFamily: "var(--font-oswald), var(--font-display)" }}
           >
             {kpis[card.key]}
           </span>
-          <span className="mt-2 text-lg text-muted font-medium tracking-wide uppercase">
+          <span className="text-base text-muted font-medium tracking-wide uppercase">
             {card.label}
           </span>
         </div>

@@ -1,5 +1,6 @@
 import type { Compliance } from "@/lib/types";
 import { getRealtimeComplianceStatus, type ComplianceStatus } from "@/lib/status";
+import { formatDate } from "@/lib/format";
 
 interface CompliancesTableProps {
   compliances: Compliance[];
@@ -87,12 +88,12 @@ export default function CompliancesTable({ compliances }: CompliancesTableProps)
                 className={`border-b border-border/30 ${status === "complied" ? "opacity-45" : ""} ${status === "overdue" ? "bg-danger/5 border-l-2 border-l-danger" : status === "not_complied" ? "bg-danger/5 border-l-2 border-l-danger" : ""} animate-fade-in-up`}
                 style={{ animationDelay: `${300 + i * 60}ms` }}
               >
-                <td className="py-3.5 pr-4 text-xl font-semibold truncate">
+                <td className="py-3.5 pr-4 text-xl font-semibold">
                   {compliance.subject}
                 </td>
-                <td className="py-3.5 pr-4 text-xl truncate">{compliance.category}</td>
-                <td className="py-3.5 pr-4 text-lg truncate">{compliance.action_required}</td>
-                <td className="py-3.5 pr-4 text-xl tabular-nums">{compliance.target_date}</td>
+                <td className="py-3.5 pr-4 text-xl">{compliance.category}</td>
+                <td className="py-3.5 pr-4 text-lg">{compliance.action_required}</td>
+                <td className="py-3.5 pr-4 text-xl tabular-nums">{formatDate(compliance.target_date)}</td>
                 <td className="py-3.5">
                   <ComplianceStatusBadge status={status} />
                 </td>

@@ -1,13 +1,14 @@
 import type { Activity, Accomplishment, Compliance, DutyPNCO, KPIs } from "./types";
-import { getRealtimeActivityStatus } from "./status";
+import { getRealtimeActivityStatus, getRealtimeComplianceStatus } from "./status";
 
 function getToday(): string {
   return normalizeDate(new Date().toISOString().split("T")[0]);
 }
 
 function normalizeDate(raw: string): string {
-  // Strip time portion if present (e.g. "2/25/2026 6:30 AM")
-  const datePart = raw.split(/\s+\d/)[0].trim();
+  // Strip time portion if present (e.g. "2/25/2026 6:30 AM" or "January 1, 2026 6:30 AM")
+  // Match time pattern at end: H:MM or HH:MM optionally followed by AM/PM
+  const datePart = raw.replace(/\s+\d{1,2}:\d{2}(:\d{2})?\s*(AM|PM)?\s*$/i, "").trim();
 
   // Handle M/D/YYYY or MM/DD/YYYY → YYYY-MM-DD
   const slashMDY = datePart.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
@@ -20,6 +21,15 @@ function normalizeDate(raw: string): string {
   if (slashYMD) {
     const [, y, m, d] = slashYMD;
     return `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
+  }
+  // Handle "Month DD, YYYY" (e.g. "February 28, 2026")
+  const longDate = datePart.match(/^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})$/);
+  if (longDate) {
+    const [, monthName, d, y] = longDate;
+    const monthIndex = new Date(`${monthName} 1, 2000`).getMonth();
+    if (!isNaN(monthIndex)) {
+      return `${y}-${String(monthIndex + 1).padStart(2, "0")}-${d.padStart(2, "0")}`;
+    }
   }
   // Already YYYY-MM-DD
   if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) return datePart;
@@ -37,10 +47,6 @@ function normalizeTime(raw: string): string {
   return raw;
 }
 
-function isComplied(remarks: string): boolean {
-  const upper = remarks.toUpperCase().trim();
-  return upper === "COMPLIED" || upper === "DISSEMINATED";
-}
 
 export function parseActivities(rows: string[][]): Activity[] {
   if (rows.length < 2) return [];
@@ -50,9 +56,9 @@ export function parseActivities(rows: string[][]): Activity[] {
 
   for (let i = 1; i < rows.length; i++) {
     const row = rows[i];
-    if (!row || row.length < 6 || !row[0]?.trim()) continue;
+    if (!row || row.length < 7 || !row[0]?.trim()) continue;
 
-    const status = row[5]?.trim();
+    const status = row[6]?.trim();
     if (status !== "Upcoming" && status !== "Completed" && status !== "Cancelled") continue;
 
     const activityDate = normalizeDate(row[3]?.trim() ?? "");
@@ -64,6 +70,7 @@ export function parseActivities(rows: string[][]): Activity[] {
       attendees: row[2]?.trim() ?? "",
       activity_date: activityDate,
       activity_time: normalizeTime(row[4]?.trim() ?? ""),
+      location: row[5]?.trim() ?? "",
       status,
       is_today: activityDate === today,
     };
@@ -136,16 +143,16 @@ export function parseCompliances(rows: string[][]): Compliance[] {
     });
   }
 
-  const complianceOrder = (remarks: string): number => {
-    const upper = remarks.toUpperCase().trim();
-    if (upper === "NOT COMPLIED" || !upper) return 0;
-    if (upper === "DISSEMINATED") return 1;
-    if (upper === "COMPLIED") return 2;
-    return 0;
+  const complianceOrder: Record<string, number> = {
+    overdue: 0,
+    due_soon: 1,
+    not_complied: 2,
+    disseminated: 3,
+    complied: 4,
   };
   compliances.sort((a, b) => {
-    const oa = complianceOrder(a.remarks);
-    const ob = complianceOrder(b.remarks);
+    const oa = complianceOrder[getRealtimeComplianceStatus(a)] ?? 1;
+    const ob = complianceOrder[getRealtimeComplianceStatus(b)] ?? 1;
     if (oa !== ob) return oa - ob;
     return a.target_date.localeCompare(b.target_date);
   });
@@ -181,17 +188,23 @@ export function computeKPIs(
   accomplishments: Accomplishment[],
   compliances: Compliance[] = []
 ): KPIs {
-  const today = getToday();
   return {
     total_activities: activities.length,
     upcoming_count: activities.filter((a) => a.status === "Upcoming").length,
     completed_count: activities.filter((a) => a.status === "Completed").length,
     total_accomplishments: accomplishments.length,
     total_compliances: compliances.length,
-    upcoming_compliances: compliances.filter(
-      (c) => c.target_date && c.target_date >= today && !isComplied(c.remarks)
-    ).length,
-    complied_count: compliances.filter((c) => isComplied(c.remarks)).length,
-    not_complied_count: compliances.filter((c) => !isComplied(c.remarks)).length,
+    upcoming_compliances: compliances.filter((c) => {
+      const s = getRealtimeComplianceStatus(c);
+      return s === "not_complied" || s === "due_soon" || s === "overdue";
+    }).length,
+    complied_count: compliances.filter((c) => {
+      const s = getRealtimeComplianceStatus(c);
+      return s === "complied" || s === "disseminated";
+    }).length,
+    not_complied_count: compliances.filter((c) => {
+      const s = getRealtimeComplianceStatus(c);
+      return s === "not_complied" || s === "due_soon" || s === "overdue";
+    }).length,
   };
 }

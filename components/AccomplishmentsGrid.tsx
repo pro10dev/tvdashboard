@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { formatDate } from "@/lib/format";
 import Image from "next/image";
 import type { Accomplishment } from "@/lib/types";
 import { toViewableImageUrl } from "@/lib/image";
@@ -73,7 +74,7 @@ function AccomplishmentCard({ item, index }: { item: Accomplishment; index: numb
           {item.description}
         </p>
         <span className="mt-auto pt-2 text-sm text-accent/60 font-medium tracking-wide tabular-nums shrink-0">
-          {item.accomplishment_date}
+          {formatDate(item.accomplishment_date)}
         </span>
       </div>
     </div>

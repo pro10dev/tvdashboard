@@ -16,14 +16,16 @@ import QuickView from "./QuickView";
 
 type Tab = "quick_view" | "activities" | "accomplishments" | "compliances" | "duty_pnco";
 const TABS: Tab[] = ["quick_view", "activities", "accomplishments", "compliances", "duty_pnco"];
-const AUTO_CYCLE_INTERVAL = 30_000; // 30 seconds
-
 interface DashboardProps {
   initialData: DashboardData;
+  tabRotateMinutes?: number;
+  refreshMinutes?: number;
+  dutyShiftTime?: string;
 }
 
-export default function Dashboard({ initialData }: DashboardProps) {
-  const { data, connectionLost, isStale } = useDashboardRefresh(initialData);
+export default function Dashboard({ initialData, tabRotateMinutes = 0.5, refreshMinutes = 5, dutyShiftTime = "08:00" }: DashboardProps) {
+  const AUTO_CYCLE_INTERVAL = tabRotateMinutes * 60 * 1000;
+  const { data, connectionLost, isStale } = useDashboardRefresh(initialData, refreshMinutes);
   const [activeTab, setActiveTab] = useState<Tab>("quick_view");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const cycleTimerRef = useRef<ReturnType<typeof setInterval>>(null);
@@ -57,7 +59,7 @@ export default function Dashboard({ initialData }: DashboardProps) {
     return () => {
       if (cycleTimerRef.current) clearInterval(cycleTimerRef.current);
     };
-  }, []);
+  }, [AUTO_CYCLE_INTERVAL]);
 
   // Reset auto-cycle timer on manual tab change
   const handleTabChange = useCallback((tab: Tab) => {
@@ -73,7 +75,7 @@ export default function Dashboard({ initialData }: DashboardProps) {
         setIsTransitioning(false);
       }, 200);
     }, AUTO_CYCLE_INTERVAL);
-  }, [switchTab]);
+  }, [switchTab, AUTO_CYCLE_INTERVAL]);
 
   return (
     <div className="relative flex h-screen w-screen flex-col bg-background text-foreground overflow-hidden">
@@ -108,7 +110,7 @@ export default function Dashboard({ initialData }: DashboardProps) {
           </>
         )}
         {activeTab === "duty_pnco" && (
-          <DutyPNCOCard roster={data.duty_pnco} />
+          <DutyPNCOCard roster={data.duty_pnco} shiftTime={dutyShiftTime} />
         )}
       </main>
     </div>

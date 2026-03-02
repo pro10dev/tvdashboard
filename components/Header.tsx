@@ -56,7 +56,7 @@ export default function Header({ lastUpdated, connectionLost, isStale }: HeaderP
               RICTMD Information Board
             </h1>
             <div className="flex items-center gap-3 mt-1">
-              <span className="text-base text-muted tracking-wide">{date}</span>
+              <span className="text-2xl tracking-wide">{date}</span>
             </div>
           </div>
         </div>

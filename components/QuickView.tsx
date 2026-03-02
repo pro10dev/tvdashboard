@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import type { DashboardData } from "@/lib/types";
 import { toViewableImageUrl } from "@/lib/image";
+import { formatDate } from "@/lib/format";
 
 interface QuickViewProps {
   data: DashboardData;
@@ -17,12 +18,8 @@ function isNotComplied(remarks: string): boolean {
 export default function QuickView({ data }: QuickViewProps) {
   const todayPnco = data.duty_pnco.find((r) => r.is_today);
 
-  const currentActivity = data.activities.find(
-    (a) => a.is_today && a.status === "Upcoming"
-  );
-  const upcomingActivity = data.activities.find(
-    (a) => !a.is_today && a.status === "Upcoming"
-  );
+  const upcomingActivities = data.activities.filter((a) => a.status === "Upcoming");
+  const nearestActivity = upcomingActivities.length > 0 ? upcomingActivities[0] : undefined;
 
   const urgentCompliances = data.compliances.filter((c) => isNotComplied(c.remarks));
 
@@ -69,20 +66,12 @@ export default function QuickView({ data }: QuickViewProps) {
       <div className="flex-1 grid grid-cols-2 gap-4 min-h-0">
         {/* Left Column */}
         <div className="flex flex-col gap-3 min-h-0">
-          {/* Current Activity */}
-          <ActivityCard
-            label="Current Activity"
-            activity={currentActivity}
-            index={0}
-            accentColor="accent"
-          />
-
           {/* Upcoming Activity */}
           <ActivityCard
             label="Upcoming Activity"
-            activity={upcomingActivity}
-            index={1}
-            accentColor="warning"
+            activity={nearestActivity}
+            index={0}
+            accentColor="accent"
           />
 
           {/* Divider */}
@@ -107,9 +96,9 @@ export default function QuickView({ data }: QuickViewProps) {
         </div>
 
         {/* Right Column */}
-        <div className="flex flex-col gap-3 min-h-0">
+        <div className="flex flex-col gap-3 min-h-0 overflow-hidden">
           {/* Urgent Compliances */}
-          <div className="flex-1 min-h-0 animate-fade-in-up" style={{ animationDelay: "150ms" }}>
+          <div className="shrink-0 animate-fade-in-up" style={{ animationDelay: "150ms" }}>
             <span
               className="text-sm font-bold tracking-[0.15em] text-danger/70 uppercase mb-2 block"
               style={{ fontFamily: "var(--font-oswald), var(--font-display)" }}
@@ -117,7 +106,7 @@ export default function QuickView({ data }: QuickViewProps) {
               Urgent Compliances
             </span>
             {urgentCompliances.length > 0 ? (
-              <div className="flex flex-col gap-2 overflow-hidden">
+              <div className="flex flex-col gap-2">
                 {urgentCompliances.slice(0, 5).map((c, i) => (
                   <div
                     key={c.id}
@@ -129,17 +118,16 @@ export default function QuickView({ data }: QuickViewProps) {
                       {c.subject}
                     </span>
                     <span
-                      className={`text-sm font-bold tracking-wider px-2.5 py-0.5 rounded-full shrink-0 ${
-                        c.category === "PRIORITY"
+                      className={`text-sm font-bold tracking-wider px-2.5 py-0.5 rounded-full shrink-0 ${c.category === "PRIORITY"
                           ? "bg-danger/10 border border-danger/30 text-danger"
                           : "bg-warning/10 border border-warning/30 text-warning"
-                      }`}
+                        }`}
                     >
                       {c.category}
                     </span>
                     {c.target_date && (
                       <span className="text-sm tabular-nums text-muted shrink-0">
-                        {c.target_date}
+                        {formatDate(c.target_date)}
                       </span>
                     )}
                   </div>
@@ -156,11 +144,19 @@ export default function QuickView({ data }: QuickViewProps) {
           </div>
 
           {/* Divider */}
-          <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+          <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent shrink-0" />
 
-          {/* Reserved space */}
-          <div className="flex-1 min-h-0 tv-card rounded-xl border-border/30 flex items-center justify-center animate-fade-in-up" style={{ animationDelay: "300ms" }}>
-            <span className="text-base text-muted/30 tracking-wider uppercase">Reserved for future use</span>
+          {/* Coming Soon */}
+          <div className="flex-1 min-h-0 flex flex-col animate-fade-in-up" style={{ animationDelay: "300ms" }}>
+            <span
+              className="text-sm font-bold tracking-[0.15em] text-muted/70 uppercase mb-2 block shrink-0"
+              style={{ fontFamily: "var(--font-oswald), var(--font-display)" }}
+            >
+              Coming Soon
+            </span>
+            <div className="flex-1 min-h-0 tv-card rounded-xl border-border/30 flex items-center justify-center">
+              <span className="text-base text-muted/30 tracking-wider uppercase">Reserved for future use</span>
+            </div>
           </div>
         </div>
       </div>
@@ -199,7 +195,7 @@ function ActivityCard({
             {activity.activity_name}
           </span>
           <span className="text-base tabular-nums text-muted shrink-0">
-            {activity.activity_date}
+            {formatDate(activity.activity_date)}
           </span>
           <span className="text-base tabular-nums text-muted shrink-0">
             {activity.activity_time}
@@ -268,7 +264,7 @@ function AccomplishmentSlideshow({ accomplishments }: { accomplishments: { accom
         </p>
         <div className="flex items-center justify-between mt-auto">
           <span className="text-xs text-accent/60 font-medium tracking-wide tabular-nums">
-            {item.accomplishment_date}
+            {formatDate(item.accomplishment_date)}
           </span>
           {accomplishments.length > 1 && (
             <span className="text-xs text-muted/40 tabular-nums">

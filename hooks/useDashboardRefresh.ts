@@ -3,16 +3,15 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { DashboardData } from "@/lib/types";
 
-const REFRESH_INTERVAL = 300_000; // 5 minutes
-const STALE_THRESHOLD = 600_000; // 10 minutes
-
 interface RefreshState {
   data: DashboardData;
   connectionLost: boolean;
   isStale: boolean;
 }
 
-export function useDashboardRefresh(initialData: DashboardData): RefreshState {
+export function useDashboardRefresh(initialData: DashboardData, refreshMinutes = 5): RefreshState {
+  const REFRESH_INTERVAL = refreshMinutes * 60 * 1000;
+  const STALE_THRESHOLD = REFRESH_INTERVAL * 2;
   const [data, setData] = useState<DashboardData>(initialData);
   const [connectionLost, setConnectionLost] = useState(false);
   const [isStale, setIsStale] = useState(false);

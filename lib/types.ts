@@ -4,6 +4,7 @@ export interface Activity {
   attendees: string;
   activity_date: string;
   activity_time: string;
+  location: string;
   status: "Upcoming" | "Completed" | "Cancelled";
   is_today: boolean;
 }
