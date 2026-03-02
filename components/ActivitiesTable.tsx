@@ -1,4 +1,5 @@
 import type { Activity } from "@/lib/types";
+import { getRealtimeActivityStatus } from "@/lib/status";
 
 interface ActivitiesTableProps {
   activities: Activity[];
@@ -45,41 +46,44 @@ export default function ActivitiesTable({ activities }: ActivitiesTableProps) {
           </tr>
         </thead>
         <tbody>
-          {display.map((activity, i) => (
-            <tr
-              key={activity.id}
-              className={`border-b border-border/30 ${rowStyle(activity)} animate-fade-in-up`}
-              style={{ animationDelay: `${300 + i * 60}ms` }}
-            >
-              <td className="py-3.5 pr-4 text-xl font-semibold truncate">
-                <span className="flex items-center gap-3">
-                  {activity.activity_name}
-                  {activity.is_today && (
-                    <span className="inline-flex items-center gap-1.5 rounded-md bg-accent/20 border border-accent/40 px-2.5 py-0.5 text-xs font-bold text-accent tracking-wider">
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-                      TODAY
-                    </span>
-                  )}
-                </span>
-              </td>
-              <td className="py-3.5 pr-4 text-xl tabular-nums truncate">{activity.activity_date}</td>
-              <td className="py-3.5 pr-4 text-xl tabular-nums truncate">{activity.activity_time}</td>
-              <td className="py-3.5 pr-4 text-xl tabular-nums truncate">{activity.attendees}</td>
-              <td className="py-3.5">
-                <StatusBadge status={activity.status} />
-              </td>
-            </tr>
-          ))}
+          {display.map((activity, i) => {
+            const status = getRealtimeActivityStatus(activity);
+            return (
+              <tr
+                key={activity.id}
+                className={`border-b border-border/30 ${rowStyle(activity, status)} animate-fade-in-up`}
+                style={{ animationDelay: `${300 + i * 60}ms` }}
+              >
+                <td className="py-3.5 pr-4 text-xl font-semibold truncate">
+                  <span className="flex items-center gap-3">
+                    {activity.activity_name}
+                    {activity.is_today && (
+                      <span className="inline-flex items-center gap-1.5 rounded-md bg-accent/20 border border-accent/40 px-2.5 py-0.5 text-xs font-bold text-accent tracking-wider">
+                        <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                        TODAY
+                      </span>
+                    )}
+                  </span>
+                </td>
+                <td className="py-3.5 pr-4 text-xl tabular-nums truncate">{activity.activity_date}</td>
+                <td className="py-3.5 pr-4 text-xl tabular-nums truncate">{activity.activity_time}</td>
+                <td className="py-3.5 pr-4 text-xl tabular-nums truncate">{activity.attendees}</td>
+                <td className="py-3.5">
+                  <StatusBadge status={status} />
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
   );
 }
 
-function rowStyle(activity: Activity): string {
-  if (activity.is_today) return "bg-accent/5 border-l-2 border-l-accent";
-  if (activity.status === "Completed") return "opacity-45";
-  if (activity.status === "Cancelled") return "opacity-35 line-through";
+function rowStyle(activity: Activity, status: Activity["status"]): string {
+  if (activity.is_today && status === "Upcoming") return "bg-accent/5 border-l-2 border-l-accent";
+  if (status === "Completed") return "opacity-45";
+  if (status === "Cancelled") return "opacity-35 line-through";
   return "";
 }
 

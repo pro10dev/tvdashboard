@@ -1,29 +1,33 @@
 import type { Compliance } from "@/lib/types";
+import { getRealtimeComplianceStatus, type ComplianceStatus } from "@/lib/status";
 
 interface CompliancesTableProps {
   compliances: Compliance[];
 }
 
-type ComplianceStatus = "not_complied" | "disseminated" | "complied";
-
-function getComplianceStatus(compliance: Compliance): ComplianceStatus {
-  const upper = compliance.remarks.toUpperCase().trim();
-  if (upper === "DISSEMINATED") return "disseminated";
-  if (upper === "COMPLIED") return "complied";
-  return "not_complied";
-}
-
 const STATUS_CONFIG: Record<ComplianceStatus, { bg: string; text: string; dot: string; label: string }> = {
+  overdue: {
+    bg: "bg-danger/10 border border-danger/30",
+    text: "text-danger",
+    dot: "bg-danger",
+    label: "OVERDUE",
+  },
   not_complied: {
     bg: "bg-danger/10 border border-danger/30",
     text: "text-danger",
     dot: "bg-danger",
     label: "NOT COMPLIED",
   },
-  disseminated: {
+  due_soon: {
     bg: "bg-warning/10 border border-warning/30",
     text: "text-warning",
     dot: "bg-warning",
+    label: "DUE SOON",
+  },
+  disseminated: {
+    bg: "bg-accent/10 border border-accent/30",
+    text: "text-accent",
+    dot: "bg-accent",
     label: "DISSEMINATED",
   },
   complied: {
@@ -76,11 +80,11 @@ export default function CompliancesTable({ compliances }: CompliancesTableProps)
         </thead>
         <tbody>
           {display.map((compliance, i) => {
-            const status = getComplianceStatus(compliance);
+            const status = getRealtimeComplianceStatus(compliance);
             return (
               <tr
                 key={compliance.id}
-                className={`border-b border-border/30 ${status === "complied" ? "opacity-45" : ""} ${status === "not_complied" ? "bg-danger/5 border-l-2 border-l-danger" : ""} animate-fade-in-up`}
+                className={`border-b border-border/30 ${status === "complied" ? "opacity-45" : ""} ${status === "overdue" ? "bg-danger/5 border-l-2 border-l-danger" : status === "not_complied" ? "bg-danger/5 border-l-2 border-l-danger" : ""} animate-fade-in-up`}
                 style={{ animationDelay: `${300 + i * 60}ms` }}
               >
                 <td className="py-3.5 pr-4 text-xl font-semibold truncate">
@@ -107,7 +111,7 @@ function ComplianceStatusBadge({ status }: { status: ComplianceStatus }) {
     <span
       className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-bold tracking-wider ${c.bg} ${c.text}`}
     >
-      <span className={`w-2 h-2 rounded-full ${c.dot} ${status === "not_complied" ? "animate-pulse" : ""}`} />
+      <span className={`w-2 h-2 rounded-full ${c.dot} ${status === "overdue" || status === "not_complied" ? "animate-pulse" : ""}`} />
       {c.label}
     </span>
   );

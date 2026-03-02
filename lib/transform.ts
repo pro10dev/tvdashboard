@@ -5,14 +5,23 @@ function getToday(): string {
 }
 
 function normalizeDate(raw: string): string {
+  // Strip time portion if present (e.g. "2/25/2026 6:30 AM")
+  const datePart = raw.split(/\s+\d/)[0].trim();
+
   // Handle M/D/YYYY or MM/DD/YYYY → YYYY-MM-DD
-  const slashMatch = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if (slashMatch) {
-    const [, m, d, y] = slashMatch;
+  const slashMDY = datePart.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (slashMDY) {
+    const [, m, d, y] = slashMDY;
+    return `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
+  }
+  // Handle YYYY/MM/DD → YYYY-MM-DD
+  const slashYMD = datePart.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
+  if (slashYMD) {
+    const [, y, m, d] = slashYMD;
     return `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
   }
   // Already YYYY-MM-DD
-  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) return datePart;
   return "";
 }
 
