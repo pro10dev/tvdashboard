@@ -9,7 +9,7 @@ interface ActivitiesTableProps {
 export default function ActivitiesTable({ activities }: ActivitiesTableProps) {
   const display = activities.filter((a) => {
     const status = getRealtimeActivityStatus(a);
-    return status === "Upcoming";
+    return status === "Upcoming" || status === "Cancelled";
   });
 
   return (
