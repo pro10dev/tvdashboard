@@ -1,4 +1,5 @@
 import type { Activity, Accomplishment, Compliance, DutyPNCO, KPIs } from "./types";
+import { getRealtimeActivityStatus } from "./status";
 
 function getToday(): string {
   return normalizeDate(new Date().toISOString().split("T")[0]);
@@ -57,7 +58,7 @@ export function parseActivities(rows: string[][]): Activity[] {
     const activityDate = normalizeDate(row[3]?.trim() ?? "");
     if (!activityDate) continue;
 
-    activities.push({
+    const activity: Activity = {
       id: row[0].trim(),
       activity_name: row[1]?.trim() ?? "",
       attendees: row[2]?.trim() ?? "",
@@ -65,7 +66,11 @@ export function parseActivities(rows: string[][]): Activity[] {
       activity_time: normalizeTime(row[4]?.trim() ?? ""),
       status,
       is_today: activityDate === today,
-    });
+    };
+
+    // Override status with real-time computation based on date+time
+    activity.status = getRealtimeActivityStatus(activity);
+    activities.push(activity);
   }
 
   const statusOrder: Record<string, number> = { Upcoming: 0, Completed: 1, Cancelled: 2 };
