@@ -1,21 +1,17 @@
 import { NextResponse } from "next/server";
-import { fetchSheetTab } from "@/lib/google";
 
 export async function GET() {
-  try {
-    const activitiesRows = await fetchSheetTab("activities");
-    const accomplishmentsRows = await fetchSheetTab("accomplishments");
+  const rawKey = process.env.GOOGLE_PRIVATE_KEY ?? "";
+  // const processedKey = rawKey.replace(/\\n/g, "\n");
+  const processedKey = rawKey;
 
-    return NextResponse.json({
-      activities_raw: activitiesRows.slice(0, 5),
-      activities_row_count: activitiesRows.length,
-      accomplishments_raw: accomplishmentsRows.slice(0, 5),
-      accomplishments_row_count: accomplishmentsRows.length,
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json({
+    email: process.env.GOOGLE_CLIENT_EMAIL ?? "MISSING",
+    sheet_id: process.env.GOOGLE_SHEET_ID ?? "MISSING",
+    key_length: rawKey.length,
+    key_starts: rawKey.substring(0, 40),
+    key_has_literal_backslash_n: rawKey.includes("\\n"),
+    key_has_real_newlines: rawKey.includes("\n"),
+    processed_key_starts: processedKey.substring(0, 40),
+  });
 }
