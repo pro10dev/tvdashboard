@@ -150,6 +150,19 @@ body::before {
   animation: live-pulse 2s ease-in-out infinite;
 }
 
+/* Scale UI for TV browsers with smaller viewports (e.g. 1366x768, 1280x720) */
+@media (max-width: 1599px) {
+  html {
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 1600px) and (max-width: 1919px) {
+  html {
+    font-size: 14px;
+  }
+}
+
 /* Scrollbar hidden for TV */
 ::-webkit-scrollbar {
   display: none;

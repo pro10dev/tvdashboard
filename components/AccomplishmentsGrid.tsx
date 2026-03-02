@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import type { Accomplishment } from "@/lib/types";
+import { toViewableImageUrl } from "@/lib/image";
 
 interface AccomplishmentsGridProps {
   accomplishments: Accomplishment[];
@@ -22,6 +23,7 @@ export default function AccomplishmentsGrid({ accomplishments }: Accomplishments
 
 function AccomplishmentCard({ item, index }: { item: Accomplishment; index: number }) {
   const [imgError, setImgError] = useState(false);
+  const imageUrl = toViewableImageUrl(item.action_photo_url);
 
   return (
     <div
@@ -30,9 +32,9 @@ function AccomplishmentCard({ item, index }: { item: Accomplishment; index: numb
     >
       {/* Image area */}
       <div className="relative h-52 w-full bg-surface overflow-hidden">
-        {item.action_photo_url && !imgError ? (
+        {imageUrl && !imgError ? (
           <Image
-            src={item.action_photo_url}
+            src={imageUrl}
             alt={item.accomplishment_name}
             fill
             className="object-cover"
@@ -60,17 +62,17 @@ function AccomplishmentCard({ item, index }: { item: Accomplishment; index: numb
       </div>
 
       {/* Content */}
-      <div className="flex flex-col gap-2 p-5 flex-1">
+      <div className="flex flex-col gap-2 p-5 flex-1 overflow-y-auto">
         <h3
           className="text-xl font-bold text-foreground leading-tight"
           style={{ fontFamily: "var(--font-oswald), var(--font-display)" }}
         >
           {item.accomplishment_name}
         </h3>
-        <p className="line-clamp-2 text-base text-muted leading-relaxed">
+        <p className="text-base text-muted leading-relaxed">
           {item.description}
         </p>
-        <span className="mt-auto text-sm text-accent/60 font-medium tracking-wide tabular-nums">
+        <span className="mt-auto pt-2 text-sm text-accent/60 font-medium tracking-wide tabular-nums shrink-0">
           {item.accomplishment_date}
         </span>
       </div>

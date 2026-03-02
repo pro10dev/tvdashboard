@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useCallback } from "react";
 
-type Tab = "activities" | "accomplishments" | "compliances" | "duty_pnco";
+type Tab = "quick_view" | "activities" | "accomplishments" | "compliances" | "duty_pnco";
 
 interface TabNavProps {
   activeTab: Tab;
@@ -10,6 +10,7 @@ interface TabNavProps {
 }
 
 const TABS: { key: Tab; label: string; icon: string }[] = [
+  { key: "quick_view", label: "QUICK VIEW", icon: "⊡" },
   { key: "activities", label: "ACTIVITIES", icon: "◈" },
   { key: "accomplishments", label: "ACCOMPLISHMENTS", icon: "★" },
   { key: "compliances", label: "COMPLIANCES", icon: "◇" },

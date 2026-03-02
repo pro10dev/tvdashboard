@@ -12,9 +12,10 @@ import ActivitiesTable from "./ActivitiesTable";
 import AccomplishmentsGrid from "./AccomplishmentsGrid";
 import CompliancesTable from "./CompliancesTable";
 import DutyPNCOCard from "./DutyPNCOCard";
+import QuickView from "./QuickView";
 
-type Tab = "activities" | "accomplishments" | "compliances" | "duty_pnco";
-const TABS: Tab[] = ["activities", "accomplishments", "compliances", "duty_pnco"];
+type Tab = "quick_view" | "activities" | "accomplishments" | "compliances" | "duty_pnco";
+const TABS: Tab[] = ["quick_view", "activities", "accomplishments", "compliances", "duty_pnco"];
 const AUTO_CYCLE_INTERVAL = 30_000; // 30 seconds
 
 interface DashboardProps {
@@ -23,12 +24,13 @@ interface DashboardProps {
 
 export default function Dashboard({ initialData }: DashboardProps) {
   const { data, connectionLost, isStale } = useDashboardRefresh(initialData);
-  const [activeTab, setActiveTab] = useState<Tab>("activities");
+  const [activeTab, setActiveTab] = useState<Tab>("quick_view");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const cycleTimerRef = useRef<ReturnType<typeof setInterval>>(null);
 
   useWakeLock();
   useGlobalErrorHandler();
+
 
   const switchTab = useCallback((tab: Tab) => {
     if (tab === activeTab) return;
@@ -87,6 +89,9 @@ export default function Dashboard({ initialData }: DashboardProps) {
           isTransitioning ? "opacity-0" : "opacity-100"
         }`}
       >
+        {activeTab === "quick_view" && (
+          <QuickView data={data} />
+        )}
         {activeTab === "activities" && (
           <>
             <KpiCards kpis={data.kpis} tab="activities" />
