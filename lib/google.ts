@@ -1,10 +1,13 @@
 import { google } from "googleapis";
 
 function getAuth() {
-  const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
-  // const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n");
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY;
-  const sheetId = process.env.GOOGLE_SHEET_ID;
+  const clientEmail = process.env.GOOGLE_CLIENT_EMAIL?.trim();
+  const rawKey = process.env.GOOGLE_PRIVATE_KEY ?? "";
+  const privateKey = rawKey
+    .replace(/^["']|["']$/g, "")  // strip surrounding quotes if present
+    .replace(/\\n/g, "\n")        // convert literal \n to real newlines
+    .trim() || undefined;
+  const sheetId = process.env.GOOGLE_SHEET_ID?.trim();
 
   if (!clientEmail || !privateKey || !sheetId) {
     throw new Error("Missing Google Sheets environment variables");
