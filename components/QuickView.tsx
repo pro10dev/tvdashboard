@@ -114,7 +114,7 @@ export default function QuickView({ data }: QuickViewProps) {
                     style={{ animationDelay: `${200 + i * 60}ms` }}
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-danger animate-pulse shrink-0" />
-                    <span className="text-base font-semibold text-foreground truncate flex-1">
+                    <span className="text-base font-semibold text-foreground flex-1">
                       {c.subject}
                     </span>
                     <span
@@ -126,7 +126,7 @@ export default function QuickView({ data }: QuickViewProps) {
                       {c.category}
                     </span>
                     {c.target_date && (
-                      <span className="text-sm tabular-nums text-muted shrink-0">
+                      <span className="text-sm font-semibold tabular-nums text-foreground/90 shrink-0">
                         {formatDate(c.target_date)}
                       </span>
                     )}
@@ -187,19 +187,21 @@ function ActivityCard({
         {label}
       </span>
       {activity ? (
-        <div className="flex items-baseline gap-4">
+        <div className="flex flex-col gap-1">
           <span
-            className="text-xl font-bold text-foreground truncate"
+            className="text-xl font-bold text-foreground"
             style={{ fontFamily: "var(--font-oswald), var(--font-display)" }}
           >
             {activity.activity_name}
           </span>
-          <span className="text-base tabular-nums text-muted shrink-0">
-            {formatDate(activity.activity_date)}
-          </span>
-          <span className="text-base tabular-nums text-muted shrink-0">
-            {activity.activity_time}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-base font-semibold tabular-nums text-foreground/90">
+              {formatDate(activity.activity_date)}
+            </span>
+            <span className="text-base font-semibold tabular-nums text-foreground/90">
+              {activity.activity_time}
+            </span>
+          </div>
         </div>
       ) : (
         <span className="text-lg text-muted/40">None scheduled</span>

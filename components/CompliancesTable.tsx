@@ -85,7 +85,7 @@ export default function CompliancesTable({ compliances }: CompliancesTableProps)
             return (
               <tr
                 key={compliance.id}
-                className={`border-b border-border/30 ${status === "complied" ? "opacity-45" : ""} ${status === "overdue" ? "bg-danger/5 border-l-2 border-l-danger" : status === "not_complied" ? "bg-danger/5 border-l-2 border-l-danger" : ""} animate-fade-in-up`}
+                className={`border-b border-border/30 ${status === "complied" ? "opacity-45" : ""} ${status === "overdue" ? "bg-danger/5 border-l-2 border-l-danger" : status === "due_soon" ? "bg-warning/5 border-l-2 border-l-warning" : ""} animate-fade-in-up`}
                 style={{ animationDelay: `${300 + i * 60}ms` }}
               >
                 <td className="py-3.5 pr-4 text-xl font-semibold">

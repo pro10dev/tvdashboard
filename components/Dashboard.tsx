@@ -87,7 +87,7 @@ export default function Dashboard({ initialData, tabRotateMinutes = 0.5, refresh
       <TabNav activeTab={activeTab} onTabChange={handleTabChange} />
 
       <main
-        className={`flex-1 overflow-hidden transition-opacity duration-200 ${
+        className={`flex-1 overflow-auto transition-opacity duration-200 ${
           isTransitioning ? "opacity-0" : "opacity-100"
         }`}
       >

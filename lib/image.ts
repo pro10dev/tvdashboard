@@ -5,23 +5,30 @@
 export function toViewableImageUrl(url: string): string {
   if (!url) return "";
 
-  // https://drive.google.com/file/d/FILE_ID/view?...
-  const fileMatch = url.match(/drive\.google\.com\/file\/d\/([^/?#]+)/);
-  if (fileMatch) {
-    return `https://lh3.googleusercontent.com/d/${fileMatch[1]}`;
-  }
-
-  // https://drive.google.com/open?id=FILE_ID
-  const openMatch = url.match(/drive\.google\.com\/open\?id=([^&#]+)/);
-  if (openMatch) {
-    return `https://lh3.googleusercontent.com/d/${openMatch[1]}`;
-  }
-
-  // https://drive.google.com/uc?id=FILE_ID&...
-  const ucMatch = url.match(/drive\.google\.com\/uc\?.*id=([^&#]+)/);
-  if (ucMatch) {
-    return `https://lh3.googleusercontent.com/d/${ucMatch[1]}`;
+  const fileId = extractDriveFileId(url);
+  if (fileId) {
+    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
   }
 
   return url;
+}
+
+function extractDriveFileId(url: string): string | null {
+  // https://drive.google.com/file/d/FILE_ID/view?...
+  const fileMatch = url.match(/drive\.google\.com\/file\/d\/([^/?#]+)/);
+  if (fileMatch) return fileMatch[1];
+
+  // https://drive.google.com/open?id=FILE_ID
+  const openMatch = url.match(/drive\.google\.com\/open\?id=([^&#]+)/);
+  if (openMatch) return openMatch[1];
+
+  // https://drive.google.com/uc?id=FILE_ID&...
+  const ucMatch = url.match(/drive\.google\.com\/uc\?.*id=([^&#]+)/);
+  if (ucMatch) return ucMatch[1];
+
+  // https://drive.google.com/thumbnail?id=FILE_ID
+  const thumbMatch = url.match(/drive\.google\.com\/thumbnail\?.*id=([^&#]+)/);
+  if (thumbMatch) return thumbMatch[1];
+
+  return null;
 }
