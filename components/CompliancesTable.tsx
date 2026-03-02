@@ -91,7 +91,9 @@ export default function CompliancesTable({ compliances }: CompliancesTableProps)
                 <td className="py-3.5 pr-4 text-xl font-semibold">
                   {compliance.subject}
                 </td>
-                <td className="py-3.5 pr-4 text-xl">{compliance.category}</td>
+                <td className="py-3.5 pr-4">
+                  <ComplianceCategoryBadge category={compliance.category} />
+                </td>
                 <td className="py-3.5 pr-4 text-lg">{compliance.action_required}</td>
                 <td className="py-3.5 pr-4 text-xl tabular-nums">{formatDate(compliance.target_date)}</td>
                 <td className="py-3.5">
@@ -114,6 +116,22 @@ function ComplianceStatusBadge({ status }: { status: ComplianceStatus }) {
     >
       <span className={`w-2 h-2 rounded-full ${c.dot} ${status === "overdue" || status === "not_complied" ? "animate-pulse" : ""}`} />
       {c.label}
+    </span>
+  );
+}
+
+function ComplianceCategoryBadge({ category }: { category: string }) {
+  const upper = category.toUpperCase().trim();
+  const style =
+    upper === "RUSH"
+      ? "bg-danger/10 border border-danger/30 text-danger"
+      : upper === "PRIORITY"
+        ? "bg-accent/10 border border-accent/30 text-accent"
+        : "bg-muted/10 border border-muted/30 text-muted";
+
+  return (
+    <span className={`inline-flex items-center rounded-full px-4 py-1.5 text-sm font-bold tracking-wider ${style}`}>
+      {category}
     </span>
   );
 }

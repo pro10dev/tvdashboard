@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
 import type { DashboardData } from "@/lib/types";
 import { toViewableImageUrl } from "@/lib/image";
 import { formatDate } from "@/lib/format";
@@ -117,14 +116,7 @@ export default function QuickView({ data }: QuickViewProps) {
                     <span className="text-base font-semibold text-foreground flex-1">
                       {c.subject}
                     </span>
-                    <span
-                      className={`text-sm font-bold tracking-wider px-2.5 py-0.5 rounded-full shrink-0 ${c.category === "PRIORITY"
-                          ? "bg-danger/10 border border-danger/30 text-danger"
-                          : "bg-warning/10 border border-warning/30 text-warning"
-                        }`}
-                    >
-                      {c.category}
-                    </span>
+                    <CategoryBadge category={c.category} />
                     {c.target_date && (
                       <span className="text-sm font-semibold tabular-nums text-foreground/90 shrink-0">
                         {formatDate(c.target_date)}
@@ -234,13 +226,13 @@ function AccomplishmentSlideshow({ accomplishments }: { accomplishments: { accom
       {/* Image */}
       <div className="relative w-2/5 bg-surface overflow-hidden shrink-0">
         {imageUrl && !imgError ? (
-          <Image
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
             src={imageUrl}
             alt={item.accomplishment_name}
-            fill
-            className="object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
             onError={() => setImgError(true)}
-            unoptimized
+            referrerPolicy="no-referrer"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-muted/30">
@@ -276,5 +268,21 @@ function AccomplishmentSlideshow({ accomplishments }: { accomplishments: { accom
         </div>
       </div>
     </div>
+  );
+}
+
+function CategoryBadge({ category }: { category: string }) {
+  const upper = category.toUpperCase().trim();
+  const style =
+    upper === "RUSH"
+      ? "bg-danger/10 border border-danger/30 text-danger"
+      : upper === "PRIORITY"
+        ? "bg-accent/10 border border-accent/30 text-accent"
+        : "bg-muted/10 border border-muted/30 text-muted";
+
+  return (
+    <span className={`text-sm font-bold tracking-wider px-2.5 py-0.5 rounded-full shrink-0 ${style}`}>
+      {category}
+    </span>
   );
 }

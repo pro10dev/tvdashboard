@@ -7,7 +7,7 @@ export function toViewableImageUrl(url: string): string {
 
   const fileId = extractDriveFileId(url);
   if (fileId) {
-    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+    return `https://drive.usercontent.google.com/download?id=${fileId}&export=view`;
   }
 
   return url;

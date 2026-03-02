@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { formatDate } from "@/lib/format";
-import Image from "next/image";
 import type { Accomplishment } from "@/lib/types";
 import { toViewableImageUrl } from "@/lib/image";
 
@@ -34,13 +33,13 @@ function AccomplishmentCard({ item, index }: { item: Accomplishment; index: numb
       {/* Image area */}
       <div className="relative h-52 w-full bg-surface overflow-hidden">
         {imageUrl && !imgError ? (
-          <Image
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
             src={imageUrl}
             alt={item.accomplishment_name}
-            fill
-            className="object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
             onError={() => setImgError(true)}
-            unoptimized
+            referrerPolicy="no-referrer"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-muted/30">
