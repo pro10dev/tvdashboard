@@ -1,5 +1,5 @@
 import type { DutyPNCO } from "@/lib/types";
-import { formatDate } from "@/lib/format";
+import { formatDateWithDay } from "@/lib/format";
 
 interface DutyPNCOCardProps {
   roster: DutyPNCO[];
@@ -66,7 +66,7 @@ export default function DutyPNCOCard({ roster, shiftTime = "08:00" }: DutyPNCOCa
                   {previousEntry.contact_number}
                 </span>
                 <span className="text-xs tabular-nums text-muted/60">
-                  {formatDate(previousEntry.date)}
+                  {formatDateWithDay(previousEntry.date)}
                 </span>
               </>
             ) : (
@@ -127,7 +127,7 @@ export default function DutyPNCOCard({ roster, shiftTime = "08:00" }: DutyPNCOCa
                   {upcoming[0].contact_number}
                 </span>
                 <span className="text-xs tabular-nums text-muted/60">
-                  {formatDate(upcoming[0].date)}
+                  {formatDateWithDay(upcoming[0].date)}
                 </span>
               </>
             ) : (
@@ -155,7 +155,7 @@ export default function DutyPNCOCard({ roster, shiftTime = "08:00" }: DutyPNCOCa
                 style={{ animationDelay: `${320 + i * 80}ms` }}
               >
                 <span className="text-base tabular-nums text-accent/80 font-medium min-w-[130px]">
-                  {formatDate(entry.date)}
+                  {formatDateWithDay(entry.date)}
                 </span>
                 <span
                   className="text-xl font-bold text-foreground flex-1"

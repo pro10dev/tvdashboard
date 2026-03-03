@@ -8,7 +8,10 @@ function getToday(): string {
 function normalizeDate(raw: string): string {
   // Strip time portion if present (e.g. "2/25/2026 6:30 AM" or "January 1, 2026 6:30 AM")
   // Match time pattern at end: H:MM or HH:MM optionally followed by AM/PM
-  const datePart = raw.replace(/\s+\d{1,2}:\d{2}(:\d{2})?\s*(AM|PM)?\s*$/i, "").trim();
+  // Strip parenthesized day-of-week suffix (e.g. "(Monday)")
+  const withoutDay = raw.replace(/\s*\([A-Za-z]+\)\s*$/, "");
+  // Strip time portion if present (e.g. "2/25/2026 6:30 AM")
+  const datePart = withoutDay.replace(/\s+\d{1,2}:\d{2}(:\d{2})?\s*(AM|PM)?\s*$/i, "").trim();
 
   // Handle M/D/YYYY or MM/DD/YYYY → YYYY-MM-DD
   const slashMDY = datePart.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
