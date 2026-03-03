@@ -19,7 +19,7 @@ export default function Welcome() {
         >
           Welcome to Regional Information and
           <br />
-          Communications Technology Management
+          Communications Technology Management Division
         </h1>
         <p
           className="text-xl tracking-[0.15em] text-muted text-center uppercase"
