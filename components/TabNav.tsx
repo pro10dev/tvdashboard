@@ -10,7 +10,7 @@ interface TabNavProps {
 }
 
 const TABS: { key: Tab; label: string; icon: string }[] = [
-  { key: "welcome", label: "WELCOME", icon: "⌂" },
+  { key: "welcome", label: "WELCOME", icon: "◉" },
   { key: "quick_view", label: "QUICK VIEW", icon: "⊡" },
   { key: "ict_inventory", label: "ICT INVENTORY", icon: "▣" },
   { key: "activities", label: "ACTIVITIES", icon: "◈" },
