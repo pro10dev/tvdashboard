@@ -14,9 +14,10 @@ import CompliancesTable from "./CompliancesTable";
 import DutyPNCOCard from "./DutyPNCOCard";
 import QuickView from "./QuickView";
 import ICTInventoryView from "./ICTInventoryView";
+import Welcome from "./Welcome";
 
-type Tab = "quick_view" | "ict_inventory" | "activities" | "accomplishments" | "compliances" | "duty_pnco";
-const TABS: Tab[] = ["quick_view", "ict_inventory", "activities", "accomplishments", "compliances", "duty_pnco"];
+type Tab = "welcome" | "quick_view" | "ict_inventory" | "activities" | "accomplishments" | "compliances" | "duty_pnco";
+const TABS: Tab[] = ["welcome", "quick_view", "ict_inventory", "activities", "accomplishments", "compliances", "duty_pnco"];
 interface DashboardProps {
   initialData: DashboardData;
   tabRotateMinutes?: number;
@@ -27,7 +28,7 @@ interface DashboardProps {
 export default function Dashboard({ initialData, tabRotateMinutes = 0.5, refreshMinutes = 5, dutyShiftTime = "08:00" }: DashboardProps) {
   const AUTO_CYCLE_INTERVAL = tabRotateMinutes * 60 * 1000;
   const { data, connectionLost, isStale } = useDashboardRefresh(initialData, refreshMinutes);
-  const [activeTab, setActiveTab] = useState<Tab>("quick_view");
+  const [activeTab, setActiveTab] = useState<Tab>("welcome");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const cycleTimerRef = useRef<ReturnType<typeof setInterval>>(null);
 
@@ -92,6 +93,9 @@ export default function Dashboard({ initialData, tabRotateMinutes = 0.5, refresh
           isTransitioning ? "opacity-0" : "opacity-100"
         }`}
       >
+        {activeTab === "welcome" && (
+          <Welcome />
+        )}
         {activeTab === "quick_view" && (
           <QuickView data={data} />
         )}
