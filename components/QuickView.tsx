@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import type { DashboardData } from "@/lib/types";
-import { toViewableImageUrl } from "@/lib/image";
 import { formatDate } from "@/lib/format";
 
 interface QuickViewProps {
@@ -22,13 +20,29 @@ export default function QuickView({ data }: QuickViewProps) {
 
   const urgentCompliances = data.compliances.filter((c) => isNotComplied(c.remarks));
 
-  // Weekly accomplishments — last 7 days
-  const oneWeekAgo = new Date();
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-  const weekThreshold = oneWeekAgo.toISOString().split("T")[0];
-  const weeklyAccomplishments = data.accomplishments.filter(
-    (a) => a.accomplishment_date >= weekThreshold
-  );
+  // ICT inventory per-item totals
+  const itItems: { label: string; total: number }[] = [
+    { label: "Desktop", total: data.it_inventory.reduce((s, i) => s + i.desktop, 0) },
+    { label: "Laptop", total: data.it_inventory.reduce((s, i) => s + i.laptop, 0) },
+    { label: "Servers", total: data.it_inventory.reduce((s, i) => s + i.servers, 0) },
+    { label: "CCTVs", total: data.it_inventory.reduce((s, i) => s + i.cctvs, 0) },
+    { label: "BWC (Live)", total: data.it_inventory.reduce((s, i) => s + i.body_worn_cameras_live, 0) },
+    { label: "BWC (Rec)", total: data.it_inventory.reduce((s, i) => s + i.body_worn_cameras_recording, 0) },
+    { label: "Drones", total: data.it_inventory.reduce((s, i) => s + i.drones, 0) },
+  ];
+  const esItems: { label: string; total: number }[] = [
+    { label: "Cybereason", total: data.it_inventory.reduce((s, i) => s + i.cybereason, 0) },
+    { label: "Sophos", total: data.it_inventory.reduce((s, i) => s + i.sophos, 0) },
+  ];
+  const ctItems: { label: string; total: number }[] = [
+    { label: "Tactical", total: data.ct_inventory.reduce((s, i) => s + i.tactical, 0) },
+    { label: "Hytera HH", total: data.ct_inventory.reduce((s, i) => s + i.hytera_handheld, 0) },
+    { label: "Hytera Base", total: data.ct_inventory.reduce((s, i) => s + i.hytera_base_radio, 0) },
+    { label: "Hytera Mobile", total: data.ct_inventory.reduce((s, i) => s + i.hytera_mobile_radio, 0) },
+    { label: "PoC OnePrime", total: data.ct_inventory.reduce((s, i) => s + i.poc_oneprime, 0) },
+    { label: "PoC Yategood", total: data.ct_inventory.reduce((s, i) => s + i.poc_yategood, 0) },
+    { label: "Smartphones", total: data.ct_inventory.reduce((s, i) => s + i.smartphones, 0) },
+  ];
 
   return (
     <div className="flex-1 flex flex-col gap-3 px-10 py-4 overflow-hidden animate-fade-in">
@@ -76,21 +90,19 @@ export default function QuickView({ data }: QuickViewProps) {
           {/* Divider */}
           <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
-          {/* Weekly Accomplishments Slideshow */}
-          <div className="flex-1 min-h-0 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
+          {/* ICT Inventory Summary */}
+          <div className="flex-1 min-h-0 animate-fade-in-up flex flex-col" style={{ animationDelay: "200ms" }}>
             <span
               className="text-sm font-bold tracking-[0.15em] text-muted/70 uppercase mb-2 block"
               style={{ fontFamily: "var(--font-oswald), var(--font-display)" }}
             >
-              Weekly Accomplishments
+              ICT Inventory
             </span>
-            {weeklyAccomplishments.length > 0 ? (
-              <AccomplishmentSlideshow accomplishments={weeklyAccomplishments} />
-            ) : (
-              <div className="tv-card rounded-xl border-border flex items-center justify-center h-full">
-                <span className="text-lg text-muted/40">No accomplishments this week</span>
-              </div>
-            )}
+            <div className="flex-1 grid grid-cols-3 gap-3 min-h-0">
+              <InventoryGroupCard title="IT Equipment" items={itItems} color="blue" delay={250} />
+              <InventoryGroupCard title="Endpoint Security" items={esItems} color="purple" delay={310} />
+              <InventoryGroupCard title="CT Equipment" items={ctItems} color="emerald" delay={370} />
+            </div>
           </div>
         </div>
 
@@ -137,19 +149,6 @@ export default function QuickView({ data }: QuickViewProps) {
 
           {/* Divider */}
           <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent shrink-0" />
-
-          {/* Coming Soon */}
-          <div className="flex-1 min-h-0 flex flex-col animate-fade-in-up" style={{ animationDelay: "300ms" }}>
-            <span
-              className="text-sm font-bold tracking-[0.15em] text-muted/70 uppercase mb-2 block shrink-0"
-              style={{ fontFamily: "var(--font-oswald), var(--font-display)" }}
-            >
-              Coming Soon
-            </span>
-            <div className="flex-1 min-h-0 tv-card rounded-xl border-border/30 flex items-center justify-center">
-              <span className="text-base text-muted/30 tracking-wider uppercase">Reserved for future use</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -202,70 +201,37 @@ function ActivityCard({
   );
 }
 
-function AccomplishmentSlideshow({ accomplishments }: { accomplishments: { accomplishment_name: string; description: string; action_photo_url: string; accomplishment_date: string }[] }) {
-  const [current, setCurrent] = useState(0);
-  const [imgError, setImgError] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval>>(null);
+const inventoryColorMap = {
+  blue: { card: "border-blue-500/30 bg-blue-500/[0.05]", title: "text-blue-300", label: "text-blue-300/60", value: "text-blue-300" },
+  purple: { card: "border-purple-500/30 bg-purple-500/[0.05]", title: "text-purple-300", label: "text-purple-300/60", value: "text-purple-300" },
+  emerald: { card: "border-emerald-500/30 bg-emerald-500/[0.05]", title: "text-emerald-300", label: "text-emerald-300/60", value: "text-emerald-300" },
+} as const;
 
-  useEffect(() => {
-    if (accomplishments.length <= 1) return;
-    timerRef.current = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % accomplishments.length);
-      setImgError(false);
-    }, 6000);
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [accomplishments.length]);
-
-  const item = accomplishments[current];
-  const imageUrl = toViewableImageUrl(item.action_photo_url);
-
+function InventoryGroupCard({ title, items, color, delay }: { title: string; items: { label: string; total: number }[]; color: keyof typeof inventoryColorMap; delay: number }) {
+  const c = inventoryColorMap[color];
   return (
-    <div className="tv-card rounded-xl border-border overflow-hidden flex h-full min-h-0">
-      {/* Image */}
-      <div className="relative w-2/5 bg-surface overflow-hidden shrink-0">
-        {imageUrl && !imgError ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
-            src={imageUrl}
-            alt={item.accomplishment_name}
-            className="absolute inset-0 w-full h-full object-cover"
-            onError={() => setImgError(true)}
-            referrerPolicy="no-referrer"
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center text-muted/30">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-              <rect x="3" y="3" width="18" height="18" rx="2" />
-              <circle cx="8.5" cy="8.5" r="1.5" />
-              <path d="M21 15l-5-5L5 21" />
-            </svg>
-          </div>
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="flex flex-col gap-1 p-4 flex-1 min-w-0">
-        <h3
-          className="text-lg font-bold text-foreground leading-tight truncate"
-          style={{ fontFamily: "var(--font-oswald), var(--font-display)" }}
-        >
-          {item.accomplishment_name}
-        </h3>
-        <p className="line-clamp-3 text-sm text-muted leading-relaxed flex-1">
-          {item.description}
-        </p>
-        <div className="flex items-center justify-between mt-auto">
-          <span className="text-xs text-accent/60 font-medium tracking-wide tabular-nums">
-            {formatDate(item.accomplishment_date)}
-          </span>
-          {accomplishments.length > 1 && (
-            <span className="text-xs text-muted/40 tabular-nums">
-              {current + 1} / {accomplishments.length}
+    <div
+      className={`tv-card rounded-xl ${c.card} flex flex-col px-4 py-3 animate-fade-in-up`}
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <span
+        className={`text-xs font-bold tracking-[0.12em] ${c.title} uppercase mb-2`}
+        style={{ fontFamily: "var(--font-oswald), var(--font-display)" }}
+      >
+        {title}
+      </span>
+      <div className="flex flex-col gap-0.5 flex-1 justify-center">
+        {items.map((item) => (
+          <div key={item.label} className="flex items-center justify-between">
+            <span className={`text-xs ${c.label}`}>{item.label}</span>
+            <span
+              className={`text-sm font-bold tabular-nums ${c.value}`}
+              style={{ fontFamily: "var(--font-oswald), var(--font-display)" }}
+            >
+              {item.total}
             </span>
-          )}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );
