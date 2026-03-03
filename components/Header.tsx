@@ -58,9 +58,6 @@ export default function Header({ lastUpdated, connectionLost, isStale }: HeaderP
             <div className="flex items-center gap-3 mt-1">
               <span className="text-2xl tracking-wide">{date}</span>
             </div>
-            {updatedLabel && (
-              <span className="text-muted">{updatedLabel}</span>
-            )}
           </div>
         </div>
 
@@ -87,11 +84,16 @@ export default function Header({ lastUpdated, connectionLost, isStale }: HeaderP
           </div>
 
           {/* Clock */}
-          <div
-            className="text-4xl font-bold text-accent tracking-wider tv-text-glow-cyan tabular-nums"
-            style={{ fontFamily: "var(--font-oswald), var(--font-display)" }}
-          >
-            {time}
+          <div className="flex flex-col items-end">
+            <div
+              className="text-4xl font-bold text-accent tracking-wider tv-text-glow-cyan tabular-nums"
+              style={{ fontFamily: "var(--font-oswald), var(--font-display)" }}
+            >
+              {time}
+            </div>
+            {updatedLabel && (
+              <span className="text-xs text-muted mt-0.5">{updatedLabel}</span>
+            )}
           </div>
         </div>
       </div>

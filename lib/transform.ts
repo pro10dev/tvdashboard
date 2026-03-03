@@ -1,4 +1,4 @@
-import type { Activity, Accomplishment, Compliance, DutyPNCO, KPIs } from "./types";
+import type { Activity, Accomplishment, Compliance, DutyPNCO, KPIs, ITInventoryItem, CTInventoryItem } from "./types";
 import { getRealtimeActivityStatus, getRealtimeComplianceStatus } from "./status";
 
 function getToday(): string {
@@ -181,6 +181,48 @@ export function parseDutyPNCO(rows: string[][]): DutyPNCO[] {
 
   roster.sort((a, b) => a.date.localeCompare(b.date));
   return roster;
+}
+
+export function parseITInventory(rows: string[][]): ITInventoryItem[] {
+  if (rows.length < 2) return [];
+  const items: ITInventoryItem[] = [];
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    if (!row || !row[0]?.trim()) continue;
+    items.push({
+      office: row[0].trim(),
+      desktop: parseInt(row[1]?.trim() ?? "0", 10) || 0,
+      laptop: parseInt(row[2]?.trim() ?? "0", 10) || 0,
+      servers: parseInt(row[3]?.trim() ?? "0", 10) || 0,
+      cctvs: parseInt(row[4]?.trim() ?? "0", 10) || 0,
+      body_worn_cameras_live: parseInt(row[5]?.trim() ?? "0", 10) || 0,
+      body_worn_cameras_recording: parseInt(row[6]?.trim() ?? "0", 10) || 0,
+      drones: parseInt(row[7]?.trim() ?? "0", 10) || 0,
+      cybereason: parseInt(row[8]?.trim() ?? "0", 10) || 0,
+      sophos: parseInt(row[9]?.trim() ?? "0", 10) || 0,
+    });
+  }
+  return items;
+}
+
+export function parseCTInventory(rows: string[][]): CTInventoryItem[] {
+  if (rows.length < 2) return [];
+  const items: CTInventoryItem[] = [];
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    if (!row || !row[0]?.trim()) continue;
+    items.push({
+      office: row[0].trim(),
+      tactical: parseInt(row[1]?.trim() ?? "0", 10) || 0,
+      hytera_handheld: parseInt(row[2]?.trim() ?? "0", 10) || 0,
+      hytera_base_radio: parseInt(row[3]?.trim() ?? "0", 10) || 0,
+      hytera_mobile_radio: parseInt(row[4]?.trim() ?? "0", 10) || 0,
+      poc_oneprime: parseInt(row[5]?.trim() ?? "0", 10) || 0,
+      poc_yategood: parseInt(row[6]?.trim() ?? "0", 10) || 0,
+      smartphones: parseInt(row[7]?.trim() ?? "0", 10) || 0,
+    });
+  }
+  return items;
 }
 
 export function computeKPIs(

@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useCallback } from "react";
 
-type Tab = "quick_view" | "activities" | "accomplishments" | "compliances" | "duty_pnco";
+type Tab = "quick_view" | "ict_inventory" | "activities" | "accomplishments" | "compliances" | "duty_pnco";
 
 interface TabNavProps {
   activeTab: Tab;
@@ -11,6 +11,7 @@ interface TabNavProps {
 
 const TABS: { key: Tab; label: string; icon: string }[] = [
   { key: "quick_view", label: "QUICK VIEW", icon: "⊡" },
+  { key: "ict_inventory", label: "ICT INVENTORY", icon: "▣" },
   { key: "activities", label: "ACTIVITIES", icon: "◈" },
   { key: "accomplishments", label: "ACCOMPLISHMENTS", icon: "★" },
   { key: "compliances", label: "COMPLIANCES", icon: "◇" },
@@ -49,7 +50,7 @@ export default function TabNav({ activeTab, onTabChange }: TabNavProps) {
   }, [handleKeyDown]);
 
   return (
-    <nav className="flex gap-3 px-10 pt-5 pb-2">
+    <nav className="flex gap-2 px-10 pt-3 pb-1">
       {TABS.map((tab, i) => {
         const isActive = activeTab === tab.key;
         return (
@@ -59,7 +60,7 @@ export default function TabNav({ activeTab, onTabChange }: TabNavProps) {
             tabIndex={0}
             onClick={() => onTabChange(tab.key)}
             className={`
-              relative px-8 py-3.5 text-xl font-bold tracking-[0.12em] uppercase transition-all duration-300
+              relative px-5 py-2 text-base font-bold tracking-[0.09em] uppercase transition-all duration-300
               rounded-lg border outline-none
               ${isActive
                 ? "bg-accent/15 border-accent/50 text-accent tv-glow-cyan"
@@ -68,14 +69,14 @@ export default function TabNav({ activeTab, onTabChange }: TabNavProps) {
             `}
             style={{ fontFamily: "var(--font-oswald), var(--font-display)" }}
           >
-            <span className="flex items-center gap-3">
-              <span className={`text-lg ${isActive ? "opacity-100" : "opacity-40"}`}>
+            <span className="flex items-center gap-2">
+              <span className={`text-base ${isActive ? "opacity-100" : "opacity-40"}`}>
                 {tab.icon}
               </span>
               {tab.label}
             </span>
             {isActive && (
-              <div className="absolute bottom-0 left-4 right-4 h-0.5 bg-accent rounded-full" />
+              <div className="absolute bottom-0 left-3 right-3 h-0.5 bg-accent rounded-full" />
             )}
           </button>
         );

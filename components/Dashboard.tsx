@@ -13,9 +13,10 @@ import AccomplishmentsGrid from "./AccomplishmentsGrid";
 import CompliancesTable from "./CompliancesTable";
 import DutyPNCOCard from "./DutyPNCOCard";
 import QuickView from "./QuickView";
+import ICTInventoryView from "./ICTInventoryView";
 
-type Tab = "quick_view" | "activities" | "accomplishments" | "compliances" | "duty_pnco";
-const TABS: Tab[] = ["quick_view", "activities", "accomplishments", "compliances", "duty_pnco"];
+type Tab = "quick_view" | "ict_inventory" | "activities" | "accomplishments" | "compliances" | "duty_pnco";
+const TABS: Tab[] = ["quick_view", "ict_inventory", "activities", "accomplishments", "compliances", "duty_pnco"];
 interface DashboardProps {
   initialData: DashboardData;
   tabRotateMinutes?: number;
@@ -93,6 +94,9 @@ export default function Dashboard({ initialData, tabRotateMinutes = 0.5, refresh
       >
         {activeTab === "quick_view" && (
           <QuickView data={data} />
+        )}
+        {activeTab === "ict_inventory" && (
+          <ICTInventoryView itInventory={data.it_inventory} ctInventory={data.ct_inventory} />
         )}
         {activeTab === "activities" && (
           <>

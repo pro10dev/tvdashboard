@@ -48,11 +48,37 @@ export interface KPIs {
   not_complied_count: number;
 }
 
+export interface ITInventoryItem {
+  office: string;
+  desktop: number;
+  laptop: number;
+  servers: number;
+  cctvs: number;
+  body_worn_cameras_live: number;
+  body_worn_cameras_recording: number;
+  drones: number;
+  cybereason: number;
+  sophos: number;
+}
+
+export interface CTInventoryItem {
+  office: string;
+  tactical: number;
+  hytera_handheld: number;
+  hytera_base_radio: number;
+  hytera_mobile_radio: number;
+  poc_oneprime: number;
+  poc_yategood: number;
+  smartphones: number;
+}
+
 export interface DashboardData {
   kpis: KPIs;
   activities: Activity[];
   accomplishments: Accomplishment[];
   compliances: Compliance[];
   duty_pnco: DutyPNCO[];
+  it_inventory: ITInventoryItem[];
+  ct_inventory: CTInventoryItem[];
   fetched_at: string;
 }
